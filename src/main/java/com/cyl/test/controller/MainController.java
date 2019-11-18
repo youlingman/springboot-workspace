@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.cyl.test.model.Car;
 import com.cyl.test.model.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -59,13 +62,15 @@ public class MainController {
     // support form data/urlencoded content type
     @RequestMapping("/params-obj")
     @ResponseBody
-    public Object requestParamsObjectHandler(User user, Car car) {
+    public Object requestParamsObjectHandler(User user, Car car, HttpServletRequest request) {
         JSONObject ujo = (JSONObject)JSON.toJSON(user);
         JSONObject cjo = (JSONObject)JSON.toJSON(car);
         JSONObject res = new JSONObject();
         res.put("user", ujo);
         res.put("car", cjo);
         res.put("modified", "params");
+        // set session here for session part
+        request.getSession().setAttribute("user", user);
         return res;
     }
 
@@ -81,6 +86,7 @@ public class MainController {
             return null;
         }
         // return value would be drop for Redirect in HttpServletResponse
+        // update: redirect setting is prior to content response
         return null;
     }
 
@@ -98,6 +104,7 @@ public class MainController {
             return null;
         }
         // return value would be drop for setting forward path in RequestDispatcher
+        // update: RequestDispatcher
         return null;
     }
 
@@ -107,6 +114,15 @@ public class MainController {
     public Object headerHandler(@RequestHeader Map headers) throws ServletException, IOException {
         System.out.println(headers.toString());
         return headers;
+    }
+
+    // handle PathVariable
+    // parse out path variable
+    @RequestMapping("/path/{name}/{id}")
+    @ResponseBody
+    public Object pathValueHandler(@PathVariable Map pathVariables) throws ServletException, IOException {
+        System.out.println(pathVariables.toString());
+        return pathVariables;
     }
 
     // handle cookies
@@ -127,20 +143,31 @@ public class MainController {
         return cookies;
     }
 
+    // session handle
+    // only for single servlet container
+    // need external storage to support distribute session
+    @RequestMapping("/session")
+    @ResponseBody
+    public Object sessionHandler(@SessionAttribute User user, HttpServletRequest request) throws ServletException, IOException {
+        // may throw exception if session not exist
+        System.out.println(user);
+        // get session from request may be better
+        System.out.println(JSONObject.toJSONString(request.getSession()));
+        return user;
+    }
+
     // todo manage multipart file
     @RequestMapping("/file")
     @ResponseBody
-    public Object multiPartHandler(@RequestParam("file") MultipartFile file) {
-
-        return file;
-    }
-
-    // handle exception for this controller
-    @ExceptionHandler
-    @ResponseBody
-    public Object exceptionHandler(Exception e) {
-        System.out.println("[caught Exception]");
-        System.out.println(e.toString());
-        return e;
+    public Object multiPartHandler(@RequestParam("file") MultipartFile file) throws IOException {
+        System.out.println(String.format("get file [%s] with size [%s]", file.getOriginalFilename(), file.getSize()));
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        InputStream inputStream = file.getInputStream();
+        while ((length = inputStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
     }
 }
