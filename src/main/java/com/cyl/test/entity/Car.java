@@ -1,4 +1,4 @@
-package com.cyl.test.model;
+package com.cyl.test.entity;
 
 import lombok.Data;
 

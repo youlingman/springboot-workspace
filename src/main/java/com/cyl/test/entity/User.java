@@ -1,4 +1,4 @@
-package com.cyl.test.model;
+package com.cyl.test.entity;
 
 import lombok.Data;
 
@@ -9,5 +9,5 @@ public class User {
 
     String id;
 
-    String[] booking;
+//    String[] booking;
 }

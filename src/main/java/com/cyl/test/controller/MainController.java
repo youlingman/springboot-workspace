@@ -2,14 +2,12 @@ package com.cyl.test.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.cyl.test.model.Car;
-import com.cyl.test.model.User;
+import com.cyl.test.entity.Car;
+import com.cyl.test.entity.User;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -156,7 +154,7 @@ public class MainController {
         return user;
     }
 
-    // todo manage multipart file
+    // handle multipart file
     @RequestMapping("/file")
     @ResponseBody
     public Object multiPartHandler(@RequestParam("file") MultipartFile file) throws IOException {
