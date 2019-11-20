@@ -7,4 +7,6 @@ public class Car {
     String model;
 
     String engine;
+
+    String userId;
 }

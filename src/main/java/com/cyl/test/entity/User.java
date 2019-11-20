@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class User {
 
-    String name;
-
     String id;
+
+    String name;
 
 //    String[] booking;
 }

@@ -1,15 +1,15 @@
 package com.cyl.test.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cyl.test.entity.User;
 import com.cyl.test.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * model层访问场景
+ * basic mybatis-plus & mysql
  */
 @Controller
 @RequestMapping("/mybatis-plus")
@@ -27,8 +27,24 @@ public class DataAccessController {
     @ResponseBody
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public Object getUserHandler(@PathVariable String id) {
-//        return userMapper.selectList(new q);
-        return id;
+        return userMapper.selectOne(new QueryWrapper<User>().eq("id", id));
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    public Object postUserHandler(@RequestBody User user) {
+        return userMapper.insert(user);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
+    public Object putUserHandler(@PathVariable String id, @RequestBody User user) {
+        return userMapper.update(user, new QueryWrapper<User>().eq("id", id));
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+    public Object deleteUserHandler(@PathVariable String id) {
+        return userMapper.delete(new QueryWrapper<User>().eq("id", id));
+    }
 }

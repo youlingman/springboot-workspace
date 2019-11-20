@@ -23,6 +23,7 @@ import java.util.Map;
     处理http请求基本场景
  */
 @Controller
+@RequestMapping("/")
 public class MainController {
 
     // post json object(parse and bind to pojo object with @RequestBody)
@@ -55,7 +56,7 @@ public class MainController {
     // get/post parameters string, bind to pojo without @RequestParam
     // can bind out multiple pojo
     // support array value(same key with multiple value)
-    // bind out multi value combine with comma split (like a=1,2,3)
+    // bind out multi value to non-list params(String), combine with comma split (like a=1,2,3)
     // response json
     // support form data/urlencoded content type
     @RequestMapping("/params-obj")
