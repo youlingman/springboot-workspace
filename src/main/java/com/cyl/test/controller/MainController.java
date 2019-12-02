@@ -48,13 +48,13 @@ public class MainController {
     // support form data/urlencoded content type
     @RequestMapping("/params")
     @ResponseBody
-    public Object requestParamsMapHandler(@RequestParam /*Map*/MultiValueMap<String, String> params, Model model) {
+    public Object requestParamsMapHandler(@RequestParam Map<String, String> params, Model model) {
         System.out.println(params.toString());
         System.out.println(model.toString());
-//        params.put("modified", "params");
-        params.put("modified", new ArrayList<String>() {{
-            add("params");
-        }});
+        params.put("modified", "params");
+//        params.put("modified", new ArrayList<String>() {{
+//            add("params");
+//        }});
         return params;
     }
 

@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @SpringBootApplication
-@MapperScan("com.cyl.test.mapper")
+@MapperScan("com.cyl.test.repository")
 public class MainApplication {
 
 	public static void main(String[] args) {
