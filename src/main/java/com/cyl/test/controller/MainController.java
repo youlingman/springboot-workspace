@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cyl.test.entity.Car;
 import com.cyl.test.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
@@ -15,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +27,7 @@ import java.util.Map;
  * 处理http请求基本场景
  */
 @Controller
+@Slf4j
 @RequestMapping("/")
 public class MainController {
 
@@ -37,7 +40,7 @@ public class MainController {
         JSONObject jo = (JSONObject) JSON.toJSON(user);
         JSONObject res = new JSONObject();
         res.put("user", jo);
-        System.out.println(res.toJSONString());
+        log.info(res.toJSONString());
         return res;
     }
 
@@ -49,8 +52,8 @@ public class MainController {
     @RequestMapping("/params")
     @ResponseBody
     public Object requestParamsMapHandler(@RequestParam Map<String, String> params, Model model) {
-        System.out.println(params.toString());
-        System.out.println(model.toString());
+        log.info(params.toString());
+        log.info(model.toString());
         params.put("modified", "params");
 //        params.put("modified", new ArrayList<String>() {{
 //            add("params");
@@ -74,6 +77,7 @@ public class MainController {
         res.put("car", cjo);
         res.put("modified", "params");
         // set session here for session part
+        // bind to current JSESSIONID
         request.getSession().setAttribute("user", user);
         return res;
     }
@@ -83,7 +87,7 @@ public class MainController {
     @RequestMapping("/redirect")
     @ResponseBody
     public String redirectHandler(@RequestParam Map<String, String> params, HttpServletResponse response, RedirectAttributes redirectAttributes) throws IOException {
-        System.out.println(params.toString());
+        log.info(params.toString());
         // not work for sendRedirect to HttpServletResponse
         redirectAttributes.addAllAttributes(params);
         redirectAttributes.addFlashAttribute("message", "redirect from /redirect");
@@ -95,7 +99,7 @@ public class MainController {
 
     @RequestMapping("/redirect2")
     public String redirect2Handler(@RequestParam Map params, RedirectAttributes redirectAttributes) throws IOException {
-        System.out.println(params.toString());
+        log.info(params.toString());
         // work in resolve redirect view
         redirectAttributes.addAllAttributes(params);
         redirectAttributes.addFlashAttribute("message", "redirect from /redirect");
@@ -107,8 +111,8 @@ public class MainController {
     @RequestMapping("/forward")
     @ResponseBody
     public String forwardHandler(@RequestParam Map params, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println(params.toString());
-        System.out.println("enter forward");
+        log.info(params.toString());
+        log.info("enter forward");
         // support relative or absolute path
         request.getRequestDispatcher("params").forward(request, response);
         // return value would be drop for setting forward path in RequestDispatcher
@@ -118,8 +122,8 @@ public class MainController {
 
     @RequestMapping("/forward2")
     public String forward2Handler(@RequestParam Map params, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println(params.toString());
-        System.out.println("enter forward2");
+        log.info(params.toString());
+        log.info("enter forward2");
         // string view name resolve
         return "forward:/params";
     }
@@ -128,7 +132,7 @@ public class MainController {
     @RequestMapping("/header")
     @ResponseBody
     public Object headerHandler(@RequestHeader Map headers) throws ServletException, IOException {
-        System.out.println(headers.toString());
+        log.info(headers.toString());
         return headers;
     }
 
@@ -137,7 +141,7 @@ public class MainController {
     @RequestMapping("/path/{name}/{id}")
     @ResponseBody
     public Object pathValueHandler(@PathVariable Map pathVariables) throws ServletException, IOException {
-        System.out.println(pathVariables.toString());
+        log.info(pathVariables.toString());
         return pathVariables;
     }
 
@@ -148,10 +152,10 @@ public class MainController {
     @RequestMapping("/cookie")
     @ResponseBody
     public Object cookieHandler(@CookieValue Cookie session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println(JSONObject.toJSONString(session));
+        log.info(JSONObject.toJSONString(session));
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
-            System.out.println(JSONObject.toJSONString(cookie));
+            log.info(JSONObject.toJSONString(cookie));
         }
         Cookie resCookie = new Cookie("token", "123456");
         resCookie.setHttpOnly(true);
@@ -164,11 +168,13 @@ public class MainController {
     // need external storage to support distribute session
     @RequestMapping("/session")
     @ResponseBody
-    public Object sessionHandler(@SessionAttribute User user, HttpServletRequest request) throws ServletException, IOException {
-        // may throw exception if session not exist
-        System.out.println(user);
-        // get session from request may be better
-        System.out.println(JSONObject.toJSONString(request.getSession()));
+    public Object sessionHandler(@SessionAttribute(required = false) User user, HttpServletRequest request, HttpSession session) throws ServletException, IOException {
+        // locate session with current JSESSIONID
+        // previous set session in /params-obj, may throw exception if session not exist and required = true
+        log.info(user.toString());
+        // can either bind out session directly / get session from ServletRequest
+        log.info(JSONObject.toJSONString(session));
+        log.info(JSONObject.toJSONString(request.getSession()));
         return user;
     }
 
@@ -176,7 +182,7 @@ public class MainController {
     @RequestMapping("/file")
     @ResponseBody
     public Object multiPartHandler(@RequestParam("file") MultipartFile file) throws IOException {
-        System.out.println(String.format("get file [%s] with size [%s]", file.getOriginalFilename(), file.getSize()));
+        log.info(String.format("get file [%s] with size [%s]", file.getOriginalFilename(), file.getSize()));
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int length;

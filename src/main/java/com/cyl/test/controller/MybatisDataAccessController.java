@@ -8,12 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * model层访问场景
  * basic mybatis-plus & mysql
  */
 @Controller
 @RequestMapping("/mybatis-plus")
-public class DataAccessController {
+public class MybatisDataAccessController {
 
     @Autowired
     private UserMapper userMapper;

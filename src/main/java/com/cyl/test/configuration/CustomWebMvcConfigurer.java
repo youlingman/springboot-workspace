@@ -1,4 +1,4 @@
-package com.cyl.test.configurer;
+package com.cyl.test.configuration;
 
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;

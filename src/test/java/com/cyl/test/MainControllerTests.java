@@ -96,5 +96,38 @@ public class MainControllerTests {
 		Assert.assertEquals(res, JSON.parseObject(resContent));
 	}
 
+	@Test
+	public void testRedirect() throws Exception {
+		JSONObject user = new JSONObject();
+		user.put("id", 1);
+		user.put("name", "John");
+		String params = new StringBuilder().append("id=").append(user.get("id"))
+				.append("&name=").append(user.get("name"))
+				.toString();
 
+		this.mockMvc.perform(post("/redirect").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(params))
+				.andDo(print()).andExpect(status().is3xxRedirection());
+		this.mockMvc.perform(post("/redirect2").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(params))
+				.andDo(print()).andExpect(status().is3xxRedirection());
+	}
+
+	@Test
+	public void testForward() throws Exception {
+
+	}
+
+	@Test
+	public void testPathValue() throws Exception {
+
+	}
+
+	@Test
+	public void testCookie() throws Exception {
+
+	}
+
+	@Test
+	public void testSession() throws Exception {
+
+	}
 }
