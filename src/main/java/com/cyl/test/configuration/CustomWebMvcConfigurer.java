@@ -25,6 +25,7 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         // springmvc forbid Content-Type cannot contain wildcard type '*' in writeWithMessageConverters
         converter.setSupportedMediaTypes(new ArrayList<MediaType>(){{
             add(MediaType.APPLICATION_JSON);
+            add(MediaType.valueOf("application/vnd.spring-boot.actuator.v3+json"));
         }});
         converters.add(0, converter);
     }
